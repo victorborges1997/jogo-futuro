@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Futuro – Touchscreen</title>
+  <script src="https://unpkg.com/kaboom@3000/dist/kaboom.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: black; }
+    #controls {
+      position: fixed;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      z-index: 10;
+    }
+    button {
+      width: 60px;
+      height: 60px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #333;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+<div id="controls">
+  <button id="left">←</button>
+  <button id="right">→</button>
+  <button id="jump">↑</button>
+</div>
+
+<script>
+kaboom({
+  width: 960,
+  height: 540,
+  background: [0, 0, 0],
+  canvas: document.createElement("canvas"),
+});
+
+// Carrega o sprite do personagem
+loadSprite("futuro", "futuro_game_sprite.png");
+loadSprite("capital", "https://i.imgur.com/UPW4jyi.jpg");
+
+scene("game", () => {
+  gravity(1600);
+
+  add([
+    sprite("capital"),
+    pos(0, 0),
+    scale(1.5),
+    layer("bg"),
+    fixed(),
+  ]);
+
+  add([
+    rect(1200, 48),
+    pos(0, 500),
+    area(),
+    solid(),
+    color(60, 60, 60),
+  ]);
+
+  add([
+    rect(200, 24),
+    pos(300, 400),
+    area(),
+    solid(),
+    color(100, 200, 100),
+  ]);
+
+  add([
+    rect(40, 40),
+    pos(550, 460),
+    area(),
+    color(255, 0, 0),
+    "danger",
+  ]);
+
+  const player = add([
+    sprite("futuro"),
+    pos(100, 100),
+    area(),
+    body(),
+    scale(0.3),
+  ]);
+
+  let movingLeft = false;
+  let movingRight = false;
+
+  onUpdate(() => {
+    if (movingLeft) player.move(-200, 0);
+    if (movingRight) player.move(200, 0);
+  });
+
+  player.onCollide("danger", () => {
+    go("game");
+  });
+
+  document.getElementById("left").addEventListener("touchstart", () => movingLeft = true);
+  document.getElementById("left").addEventListener("touchend", () => movingLeft = false);
+
+  document.getElementById("right").addEventListener("touchstart", () => movingRight = true);
+  document.getElementById("right").addEventListener("touchend", () => movingRight = false);
+
+  document.getElementById("jump").addEventListener("touchstart", () => {
+    if (player.isGrounded()) {
+      player.jump(600);
+    }
+  });
+});
+
+go("game");
+</script>
+</body>
+</html>
